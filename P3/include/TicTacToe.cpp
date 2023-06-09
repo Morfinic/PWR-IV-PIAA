@@ -220,7 +220,7 @@ int TicTacToe::minimax(int depth, bool maximizingPlayer) {
 
     if (maximizingPlayer)
     {
-        int maxScore = INT_MIN;
+        int minScore = INT_MAX;
 
         for (int x = 1; x <= size; x++)
         {
@@ -230,17 +230,17 @@ int TicTacToe::minimax(int depth, bool maximizingPlayer) {
                 {
                     coords[x - 1][y - 1] = ai_symbol;
 
-                    maxScore = std::max(maxScore, minimax(depth + 1, false));
+                    minScore = std::min(minScore, -minimax(depth + 1, false));
 
                     coords[x - 1][y - 1] = 0;
                 }
             }
         }
-        return maxScore;
+        return minScore + depth;
     }
     else
     {
-        int minScore = INT_MAX;
+        int maxScore = INT_MIN;
 
         for (int x = 1; x <= size; x++)
         {
@@ -250,18 +250,18 @@ int TicTacToe::minimax(int depth, bool maximizingPlayer) {
                 {
                     coords[x - 1][y - 1] = player_symbol;
 
-                    minScore = std::min(minScore, -minimax(depth + 1, true));
+                    maxScore = std::max(maxScore, minimax(depth + 1, true));
 
                     coords[x - 1][y - 1] = 0;
                 }
             }
         }
-        return minScore;
+        return maxScore + depth;
     }
 }
 
 void TicTacToe::makeBestMove() {
-    int bestMoveVal = INT_MIN;
+    int bestMoveVal = INT_MAX;
     int bestMoveX = 0;
     int bestMoveY = 0;
 
@@ -277,7 +277,7 @@ void TicTacToe::makeBestMove() {
 
                 coords[x - 1][y - 1] = 0;
 
-                if (moveVal > bestMoveVal)
+                if (moveVal < bestMoveVal)
                 {
                     bestMoveX = x;
                     bestMoveY = y;
