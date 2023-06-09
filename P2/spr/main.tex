@@ -1,0 +1,191 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{tabularray}
+\usepackage{pgfplots}
+
+\title
+{
+    Projektowanie i analiza algorytmów \\
+    Sprawozdanie \\
+    Mini-projekt 2
+}
+\author{Filip Juchnowicz \vspace{10pt} \\ Indeks 264176}
+\date{08.05.2023}
+
+\begin{document}
+    \maketitle
+    \thispagestyle{empty}
+    
+    \newpage
+    
+    \tableofcontents
+    \listoffigures
+    \listoftables
+    
+    \newpage
+    
+    \section{Opis zadania}
+    Dla wybranych algorytmów sortowania przeprowadź następujące testy efektywności:
+    \begin{enumerate}
+        \item Wczytaj $n$ wpisów z pliku \texttt{projekt2\_dane.csv},
+        \item Przefiltruj wczytane wpisy pod kątem brakujących danych,
+        \item Dla $n \in \left\lbrace 10\;000, 100\;000, 500\;000, 1\;000\;000, 1\;010\;292\right\rbrace$ wczytanych wpisów:
+            \begin{enumerate}
+                \item wywołaj kolejne algorytmy sortowania i zmierz czas trwania algorytmu,
+                \item oblicz średnią i medianę ocen.
+            \end{enumerate}
+    \end{enumerate}
+    
+    \section{Algorytmy sortowania}
+    \subsection{Quick sort}
+    Algorytm \texttt{quicksort} opart jest na metodzie \texttt{divide and conquer} (dziel i zwyciężaj). Na początku wybierany jest \texttt{pivot}, element na podstawie którego elementy są dzielone na dwa podzbiory: większe i mniejsze od \texttt{pivot'u}. Proces ten jest powtarzany, aż do uzyskania podzbiorów jednoelementowych. Wybór \texttt{pivota} wpływa na złożoność obliczeniową algorytmu.
+    \begin{itemize}
+        \item Złożoność czasowa:
+        \begin{itemize}
+            \item optymistyczna - $O\left(n\log\left(n\right)\right)$,
+            \item pesymistyczna - $O\left(n^2\right)$.
+        \end{itemize}
+        \item Złożoność pamięciowa: $O\left(n\right)$.
+    \end{itemize}
+
+    \subsection{Merge sort}
+    Algorytm \texttt{mergesort} także korzysta z metody D\&C, dzieląc podany zestaw elementów na mniejsze, łatwiejsze do posortowania zbiory. Algorytm dzieli elementy do uzyskania zbiorów jednoelementowych. Następnie, jak wynika z nazwy, scala je oraz sortuje. Wynikiem końcowym są posortowane elementy.
+    \begin{itemize}
+        \item Złożoność czasowa: $O\left(n\log \left(n\right)\right)$.
+        \item Złożoność pamięciowa: $O\left(n\right)$.
+    \end{itemize}
+
+    \newpage
+    \subsection{Bucket sort}
+    Algorytm polega na ,,rozrzuceniu'' elementów do $n$ kubełków (ilość kubełków i ich zakres zależy od implementacji). Następnie każdy niepusty kubełek jest sortowany, a na końcu elementy są przepisywane do oryginalnej tablicy. Istnieje szczególny przypadek kiedy ilość kubełków jest równa zakresowi danych (np. 5 kubełków dla zbioru zawierającego tylko liczby $1, 2, 3, 4, 5$). Nie wymagane jest wtedy sortowanie poszczególnych kubełków co znacząca zmniejsza czas trwania algorytmu.
+    \begin{itemize}
+        \item Złożoność czasowa:
+        \begin{itemize}
+            \item optymistyczna - $O\left(n\right)$,
+            \item pesymistyczna - $O\left(n^2\right)$.
+        \end{itemize}
+        \item Złożoność pamięciowa: $O\left(n\right)$.
+    \end{itemize}
+    
+    \section{Wyniki}
+    \begin{table}[h!]
+        \centering
+        \resizebox{\linewidth}{!}{%
+            \begin{tblr}{
+                    cells = {c},
+                    cell{1}{1} = {r=2}{},
+                    cell{1}{2} = {c=2,r=2}{},
+                    cell{1}{4} = {c=4}{},
+                    cell{3}{1} = {r=3}{},
+                    cell{4}{5} = {c=3}{},
+                    cell{5}{5} = {c=3}{},
+                    cell{6}{1} = {r=3}{},
+                    cell{7}{5} = {c=3}{},
+                    cell{8}{5} = {c=3}{},
+                    cell{9}{1} = {r=3}{},
+                    cell{10}{5} = {c=3}{},
+                    cell{11}{5} = {c=3}{},
+                    cell{12}{1} = {r=3}{},
+                    cell{13}{5} = {c=3}{},
+                    cell{14}{5} = {c=3}{},
+                    cell{15}{1} = {r=3}{},
+                    cell{16}{5} = {c=3}{},
+                    cell{17}{5} = {c=3}{},
+                    vlines,
+                    hline{1,3,6,9,12,15,18} = {-}{},
+                    hline{2} = {4-7}{},
+                    hline{4-5,7-8,10-11,13-14,16-17} = {2-7}{},
+                }
+                n & filtrowanie (ms) &  & sortowanie (ms) &  &  & \\
+                &  &  & typ & quicksort & mergesort & bucketsort\\
+                $10\;000$ & błędne & - & czas & $5.293$ & $14.623$ & $2.069$\\
+                & pozostałe & $10\;000$ & średnia & $5.4603$ &  & \\
+                & czas & $0.03$ & mediana & $5$ &  & \\
+                $100\;000$ & błędne & $4186$ & czas & $79.65$ & $166.831$ & $27.227$\\
+                & pozostałe & $95\;814$ & średnia & $6.0642$ &  & \\
+                & czas & $0.4922$ & mediana & $6$ &  & \\
+                $500\;00$0 & błędne & $23\;308$ & czas & $420.811$ & $1057.38$ & $144.698$\\
+                & pozostałe & $476\;692$ & średnia & $6.6554$ &  & \\
+                & czas & $2.7724$ & mediana & $7$ &  & \\
+                $1\;000\;000$ & błędne & $43\;733$ & czas & $913.625$ & $2206.92$ & $307.622$\\
+                & pozostałe & $956\;267$ & średnia & $6.6343$ &  & \\
+                & czas & $4.3564$ & mediana & $7$ &  & \\
+                $1\;020\;292$ & błędne & $57\;389$ & czas & $877.419$ & $2240.86$ & $288.21$\\
+                & pozostałe & $962\;903$ & średnia & $6.6366$ &  & \\
+                & czas & $4.3757$ & mediana & $7$ &  & 
+            \end{tblr}
+        }
+    \caption{Tabela wyników algorytmów filtrowania i sortowania.}
+    \end{table}
+
+    \newpage
+    \begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                height=0.7\textwidth,
+                grid,
+                xlabel={Ilość danych $n$},
+                ylabel={Czas sortowania [ms]},
+                ymin=1, xmin=8000,
+                legend pos=north west
+            ]
+            \addplot[color=red, mark=x] coordinates {
+                (10000, 5.293)
+                (95814, 79.65)
+                (476692, 420.811)
+                (956267, 913.625)
+                (962903, 877.419)
+            }; \addlegendentry{quicksort}
+            \addplot[color=blue, mark=o] coordinates {
+                (10000, 14.623)
+                (95814, 166.831)
+                (476692, 1057.38)
+                (956267, 2206.92)
+                (962903, 2240.86)
+            }; \addlegendentry{mergesort}
+        \addplot[color=green, mark=*] coordinates {
+                (10000, 2.069)
+                (95814, 27.227)
+                (476692, 144.698)
+                (956267, 307.622)
+                (962903, 288.21)
+            }; \addlegendentry{bucketsort $b = 10$}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Porównanie efektywności algorytmów sortowania.}
+    \end{figure}
+    \begin{figure}[h!]
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                height=0.7\textwidth,
+                grid,
+                xlabel={Ilość danych $n$},
+                ylabel={Czas filtrowania [ms]},
+                ymin=0, xmin=8000,
+                legend pos=north west
+                ]
+                \addplot[color=red, mark=x] coordinates {
+                    (10000, 0.03)
+                    (95814, 0.4922)
+                    (476692, 2.7724)
+                    (956267, 4.3564)
+                    (962903, 4.3757)
+                }; \addlegendentry{filtr}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Czas filtrowania struktury.}
+    \end{figure}
+
+    Na powyższych wykresach można zauważyć, że złożoność czasowa filtrowania jest równa $O\left(n\right)$, a czasy sortowań skalują się liniowo wraz z ilością elementów. Najszybszym algorytmem jest sortowanie kubełkowe, prawdopodobnie ze względu na małą ilość możliwych wartości i odpowiednio dobraną ilością kubełków, co pozwala pominąć sortowanie wewnątrz kubełków. Najgorzej wypadł mergesort, mimo że ma podobną złożoność jak quicksort. Jest to spowodowane czasem trwania operacji, a nie ich ilością (która jest brana pod uwagę podczas szacowania złożoności czasowej).
+    
+\end{document}

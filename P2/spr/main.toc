@@ -1,0 +1,7 @@
+\babel@toc {polish}{}\relax 
+\contentsline {section}{\numberline {1}Opis zadania}{3}{section.1}%
+\contentsline {section}{\numberline {2}Algorytmy sortowania}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Quick sort}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Merge sort}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Bucket sort}{4}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Wyniki}{4}{section.3}%

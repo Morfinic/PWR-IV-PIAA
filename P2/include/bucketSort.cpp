@@ -1,3 +1,4 @@
+#include "quickSort.h"
 #include "bucketSort.h"
 
 void bucketInsertionSort(std::vector<Movie> &array, int array_size){
@@ -22,7 +23,7 @@ void bucketSort(Movie *array, int num_buckets, int array_size){
         if(array[i].rating < minEl)
             minEl = array[i].rating;
     }
-    auto range = (maxEl - minEl) / num_buckets;
+    auto range = (maxEl - minEl) / float(num_buckets);
     std::vector<std::vector<Movie>> tmp;
 
     for(int i = 0; i < num_buckets; i++)
@@ -31,20 +32,21 @@ void bucketSort(Movie *array, int num_buckets, int array_size){
     for(int i = 0; i < array_size; i++){
         int idx = int((array[i].rating - minEl) / range);
         if(idx == num_buckets)
-            tmp[idx-1].push_back(array[i]);
+            tmp.at(idx-1).push_back(array[i]);
         else
-            tmp[idx].push_back(array[i]);
+            tmp.at(idx).push_back(array[i]);
     }
 
-    for(auto &bucket: tmp) {
-        if(!bucket.empty())
-            bucketInsertionSort(bucket, bucket.size());
-    }
+    if(num_buckets < 10)
+        for(auto &bucket: tmp) {
+            if(!bucket.empty())
+                bucketInsertionSort(bucket, bucket.size());
+        }
 
     int k{0};
-    for(auto bucket: tmp)
+    for(const auto& bucket: tmp)
         if(!bucket.empty())
-            for(auto movie: bucket){
+            for(const auto& movie: bucket){
                 array[k] = movie;
                 k++;
             }

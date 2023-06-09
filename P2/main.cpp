@@ -30,13 +30,6 @@ string isSorted(Movie *array, int array_length){
     return "true";
 }
 
-//bool stringCheck(string *array){
-//    for(int i = 0; i < 3; i++)
-//        if(array[i].empty())
-//            return false;
-//    return true;
-//}
-
 void get_movies_csv(Movie *array, const string &file, int size){
     ifstream file_stream("../" + file, ios::in);
     string tmp; getline(file_stream, tmp);
@@ -54,15 +47,6 @@ void get_movies_csv(Movie *array, const string &file, int size){
                     tmp.substr(firstComma+1, tmp.size() - firstComma - (tmp.size() - secondComma) - 1),
                     tmp.substr(secondComma+1, tmp.size()-secondComma)
             };
-
-//            if(stringCheck(data)) {
-//                array[i].ll = stoi(data[0]);
-//                array[i].name = data[1];
-//                array[i].rating = stof(data[2]);
-//            } else{
-//                i--;
-//                continue;
-//            }
 
             array[i].ll = stoi(data[0]);
             if(data[1].empty())
@@ -82,72 +66,84 @@ void get_movies_csv(Movie *array, const string &file, int size){
     }
 }
 
+int last_viable_idx(Movie *array, int last){
+    for(int i = last; i >= 0; i--)
+        if(!array[i].name.empty() && array[i].rating != -1)
+            return i;
+    return last;
+}
+
+int array_filter(Movie *array, int limit){
+    int lastIdx{last_viable_idx(array, limit-1)};
+
+    for(int i = 0; i <= lastIdx; i++){
+        if(array[i].name.empty() || array[i].rating == -1){
+            swap(array[i], array[lastIdx]);
+            lastIdx = last_viable_idx(array, lastIdx-1);
+        }
+    }
+
+    return lastIdx;
+}
+
+void save_result_to_file(Movie *array, int num){
+    ofstream file{"../Data/" + to_string(num) + ".txt", ios::out};
+    for(int i = 0; i < num; i++){
+        file << array[i];
+    }
+}
+
+float get_average(Movie *array, int array_length){
+    float sum{0}, cnt{0};
+    for(int i = 0; i < array_length; i++){
+        sum += array[i].rating;
+        cnt++;
+    }
+    return sum / cnt;
+}
+
+float get_median(Movie *array, int array_length){
+    if(array_length % 2 == 0)
+        return (array[int(array_length/2)-1].rating + array[int(array_length/2)].rating)/2;
+    else return array[int(array_length/2)].rating;
+}
+
 int main(){
     int no_data_to_read[] = {10000, 100000, 500000, 1000000, 1010292};
+//    int no_data_to_read[] = {10};
 
     for(auto num: no_data_to_read){
         auto *movies = new Movie[num];
-
         get_movies_csv(movies, "projekt2_dane.csv", num);
 
         auto t1 = high_resolution_clock::now();
-        quick_sort(movies, 0, num - 1);
-//      mergeSort(movies, 0, num - 1);
-//      bucketSort(movies, 3, num);
+        int limit{array_filter(movies, num)};
         auto t2 = high_resolution_clock::now();
 
+        cout<<"\nNo elems: "<<limit+1<<"\n";
+        duration<double, milli> filter_time_milli = t2 - t1;
+        cout<<"Filter time(ms): "<<filter_time_milli.count()<<"\n";
+
+        t1 = high_resolution_clock::now();
+            quick_sort(movies, 0, limit);
+//            mergeSort(movies, 0, limit);
+//            bucketSort(movies, 10, limit+1);
+        t2 = high_resolution_clock::now();
+
 //        for(int i = 0; i < num; i++){
-//            cout<<movies[i]<<"\n";
+//            cout<<movies[i];
 //        }
 
         duration<double, milli> func_time_milli = t2 - t1;
-        cout<<"No elems: "<<num<<"\n";
-        cout<<"Func time(s): "<<func_time_milli.count() / 1000<<"\n";
         cout<<"Func time(ms): "<<func_time_milli.count()<<"\n";
-        cout<<"Is array sorted? "<<isSorted(movies, num)<<"\n\n";
+        cout<<"Is array sorted? "<<isSorted(movies, limit+1)<<"\n";
+        cout<<"Average rating: "<<get_average(movies, limit+1)<<"\n";
+        cout<<"Median rating: "<<get_median(movies, limit+1)<<"\n";
+
+        save_result_to_file(movies, num);
 
         delete[] movies;
     }
-
-//    ifstream file("../projekt2_dane.csv", ios::in);
-//    string tmp; getline(file, tmp);
-//
-//    Movie movies[moviesNum];
-
-//    if(file.good()){
-//        for(auto &movie : movies){
-//            getline(file, tmp);
-//
-//            short firstComma, secondComma;
-//            firstComma = tmp.find_first_of(',');
-//            secondComma = tmp.find_last_of(',');
-//
-//            movie.ll = stoi(tmp.substr(0, firstComma));
-//            movie.name = tmp.substr(firstComma+1, tmp.size() - firstComma - (tmp.size() - secondComma) - 1);
-//            movie.rating = stof(tmp.substr(secondComma+1, tmp.size()-secondComma));
-//        }
-//
-//        file.close();
-//    }
-//    else {
-//        cout<<"ERROR\n";
-//    }
-
-//    auto t1 = high_resolution_clock::now();
-////    bubble_sort(movies);
-////    quick_sort(movies, 0, moviesNum);
-////    mergeSort(movies, 0, moviesNum - 1);
-//    bucketSort(movies, 3, moviesNum);
-//    auto t2 = high_resolution_clock::now();
-//
-//    for(const Movie &m: movies){
-//        cout<<m<<"\n";
-//    }
-//
-//    duration<double, milli> func_time_milli = t2 - t1;
-//    cout<<"Func time(s): "<<func_time_milli.count() / 1000<<"\n";
-//    cout<<"Func time(ms): "<<func_time_milli.count()<<"\n";
-//    cout<<"Is array sorted? "<<isSorted(movies, moviesNum)<<endl;
 
     return 0;
 }
