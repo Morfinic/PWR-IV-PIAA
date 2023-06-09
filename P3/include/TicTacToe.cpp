@@ -1,7 +1,7 @@
 #include "TicTacToe.h"
 #include <iostream>
 
-TicTacToe::TicTacToe(int size, int num2win): size(size), num2win(num2win), coords(size, std::vector<char>(size)){
+TicTacToe::TicTacToe(int size, int num2win, int ai_depth): size(size), num2win(num2win), ai_depth(ai_depth), coords(size, std::vector<char>(size)) {
     for(int x = 0; x < size; x++)
         for(int y = 0; y < size; y++)
             coords[x][y] = 0;
@@ -65,7 +65,7 @@ void TicTacToe::reset(){
             coords[x][y] = ' ';
 }
 
-bool TicTacToe::switchTo(const std::string who) {
+void TicTacToe::switchTo(const std::string who) {
     if(who == "player")
         player_turn = true;
     else if(who == "ai")
@@ -115,9 +115,9 @@ int TicTacToe::gameState() const {
             }
 
             if(player_win >= num2win)
-                return 1;
+                return 10;
             else if(ai_win >= num2win)
-                return -1;
+                return -10;
         }
     }
 
@@ -140,9 +140,9 @@ int TicTacToe::gameState() const {
             }
 
             if(player_win >= num2win)
-                return 1;
+                return 10;
             else if(ai_win >= num2win)
-                return -1;
+                return -10;
         }
     }
 
@@ -166,9 +166,9 @@ int TicTacToe::gameState() const {
                 }
 
                 if(player_win >= num2win)
-                    return 1;
+                    return 10;
                 else if(ai_win >= num2win)
-                    return -1;
+                    return -10;
             }
         }
 
@@ -191,11 +191,100 @@ int TicTacToe::gameState() const {
                 }
 
                 if(player_win >= num2win)
-                    return 1;
+                    return 10;
                 else if(ai_win >= num2win)
-                    return -1;
+                    return -10;
             }
         }
 
     return 0;
+}
+
+int TicTacToe::minimax(int depth, bool maximizingPlayer) {
+    if (depth == ai_depth)
+    {
+        return 0;
+    }
+
+    int score = gameState();
+
+    if (score != 0)
+    {
+        return score;
+    }
+
+    if (isFull())
+    {
+        return 0;
+    }
+
+    if (maximizingPlayer)
+    {
+        int maxScore = INT_MIN;
+
+        for (int x = 1; x <= size; x++)
+        {
+            for (int y = 1; y <= size; y++)
+            {
+                if (!isOccupied(x,y))
+                {
+                    coords[x - 1][y - 1] = ai_symbol;
+
+                    maxScore = std::max(maxScore, minimax(depth + 1, false));
+
+                    coords[x - 1][y - 1] = 0;
+                }
+            }
+        }
+        return maxScore;
+    }
+    else
+    {
+        int minScore = INT_MAX;
+
+        for (int x = 1; x <= size; x++)
+        {
+            for (int y = 1; y <= size; y++)
+            {
+                if (!isOccupied(x, y))
+                {
+                    coords[x - 1][y - 1] = player_symbol;
+
+                    minScore = std::min(minScore, -minimax(depth + 1, true));
+
+                    coords[x - 1][y - 1] = 0;
+                }
+            }
+        }
+        return minScore;
+    }
+}
+
+void TicTacToe::makeBestMove() {
+    int bestMoveVal = INT_MIN;
+    int bestMoveX = 0;
+    int bestMoveY = 0;
+
+    for (int x = 1; x <= size; x++)
+    {
+        for (int y = 1; y <= size; y++)
+        {
+            if (!isOccupied(x, y))
+            {
+                coords[x - 1][y - 1] = ai_symbol;
+
+                int moveVal = minimax(0, false);
+
+                coords[x - 1][y - 1] = 0;
+
+                if (moveVal > bestMoveVal)
+                {
+                    bestMoveX = x;
+                    bestMoveY = y;
+                    bestMoveVal = moveVal;
+                }
+            }
+        }
+    }
+    set(bestMoveX, bestMoveY);
 }

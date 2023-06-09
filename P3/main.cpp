@@ -19,7 +19,7 @@ int main(){
             cin>>num2win;
         }while(num2win < 2 && num2win > size);
 
-        cout<<"Set AI recursion depth: \n";
+        cout<<"Set AI recursion depth: ";
         cin>>ai_depth;
 
         cout<<"Rules: \n"
@@ -35,7 +35,7 @@ int main(){
         cin>>start_game;
     }
 
-    TicTacToe _board(size, num2win);
+    TicTacToe _board(size, num2win, ai_depth);
 
     while(_board.gameState() == 0 && !_board.isFull()){
         _board.print();
@@ -67,39 +67,15 @@ int main(){
             _board.set(x, y);
             _board.switchTo("ai");
         } else {
-            int x, y;
-            while(true){
-                cout<<"ai turn (x, y) ...\n";
-                cin>>x>>y;
-
-                if(x >= 1 && x <= _board.getSize() && y >= 1 && y <= _board.getSize() && !_board.isOccupied(x, y))
-                    break;
-
-                if(x < 1 || x > _board.getSize() || y < 1 || y > _board.getSize()){
-                    _board.print();
-                    cout<<"Wrong coords.\n";
-                    continue;
-                }
-
-                if(_board.isOccupied(x, y)){
-                    _board.print();
-                    cout<<"Field ("<<x<<","<<y<<") taken by ";
-                    if(_board.coordCheck(x, y) == _board.getPlayerSymbol())
-                        cout<<"player.\n";
-                    else
-                        cout<<"ai.\n";
-                    continue;
-                }
-            }
-            _board.set(x, y);
+            _board.makeBestMove();
             _board.switchTo("player");
         }
     }
 
     _board.print();
-    if(_board.gameState() == 1)
+    if(_board.gameState() == 10)
         cout<<"Player wins.";
-    else if(_board.gameState() == -1)
+    else if(_board.gameState() == -10)
         cout<<"AI wins.";
     else
         cout<<"Draw.";
