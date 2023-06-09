@@ -17,7 +17,7 @@ public:
     char getPlayerSymbol() const { return player_symbol; };
     char getAiSymbol() const { return ai_symbol; };
     int getSize() const { return size; };
-    int minimax(int depth, bool player_turn);
+    int minimax(int depth, bool player_turn, int alpha, int beta);
     void makeBestMove();
 private:
     int size;
